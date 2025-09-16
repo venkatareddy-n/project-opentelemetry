@@ -42,6 +42,7 @@ fn init_meter_provider() -> opentelemetry_sdk::metrics::SdkMeterProvider {
         .with_resource(get_resource())
         .with_periodic_exporter(
             opentelemetry_otlp::MetricExporter::builder()
+                .with_temporality(opentelemetry_sdk::metrics::Temporality::Delta)
                 .with_tonic()
                 .build()
                 .expect("Failed to initialize metric exporter"),
