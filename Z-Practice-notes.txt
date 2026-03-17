@@ -1,0 +1,64 @@
+1. instll ebs csi drivers in your cluser
+
+EBS Dynamic Provisioning Not Working 
+====================================
+By default, eksctl does not install the EBS CSI driver
+
+Step-by-Step Fix
+================
+Step 1: Install the AWS EBS CSI Driver
+
+--> By default, eksctl does not install the EBS CSI driver.
+
+--> So we need to manually install it using the official overlay:
+
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.35"
+ 
+
+2. Step 2: Attach IAM Policies to Worker Node Role
+======
+
+--> Even after installing the driver, your PVC might still show as Pending.
+
+-->That’s because your Node Group’s EC2 IAM Role doesn’t have permission to manage EBS.
+                                
+-->So we must manually attach IAM policies.
+
+1. Go to AWS Console
+
+2.IAM → Click on it
+
+3.Look for the role that looks like:
+
+eksctl-my-cluster-nodegroup-mynode-NodeInstanceRole
+
+4.Click on that role.
+
+5. Inside the role: Click on Add permissions Then click on Attach policies
+
+Search and Attach the following AWS-managed policy
+
+AmazonEBSCSIDriverPolicy
+
+3rd Step
+=========
+go to k8s folder and create service account by applying below command
+
+kubectl apply -f serviceaccount.yaml
+
+kubectl get sa --> to check service account status
+
+4th Step
+=========
+
+kubectl apply -f full-deployment-all-files.yaml
+
+5th
+===
+
+goto k8s --> frontend --> svc.yaml
+
+change ClusterIP to LoadBalancer--> to access application from outside world
+
+
+
